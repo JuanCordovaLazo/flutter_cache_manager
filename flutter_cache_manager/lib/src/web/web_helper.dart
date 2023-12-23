@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_cache_manager/src/cache_store.dart';
 import 'package:flutter_cache_manager/src/storage/cache_object.dart';
+import 'package:flutter_cache_manager/src/utils/base62_converter.dart';
 import 'package:flutter_cache_manager/src/web/queue_item.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:uuid/uuid.dart';
@@ -28,6 +29,7 @@ class WebHelper {
   final FileService fileFetcher;
   final Map<String, BehaviorSubject<FileResponse>> _memCache;
   final Queue<QueueItem> _queue = Queue();
+  final bool _useShortenedUrls = true;
 
   ///Download the file from the url
   Stream<FileResponse> downloadFile(String url,
@@ -91,7 +93,9 @@ class WebHelper {
             url,
             key: key,
             validTill: clock.now(),
-            relativePath: '${const Uuid().v1()}.file',
+            relativePath: _useShortenedUrls
+                ? '${Base62Converter.encode(url)}.file'
+                : '${const Uuid().v1()}.file',
           )
         : cacheObject.copyWith(url: url);
     final response = await _download(cacheObject, authHeaders);
@@ -167,7 +171,9 @@ class WebHelper {
         _removeOldFile(filePath);
       }
       // Store new file on different path
-      filePath = '${const Uuid().v1()}$fileExtension';
+      filePath = _useShortenedUrls
+          ? '${Base62Converter.encode(cacheObject.url)}$fileExtension'
+          : '${const Uuid().v1()}$fileExtension';
     }
     return cacheObject.copyWith(
       relativePath: filePath,

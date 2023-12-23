@@ -28,4 +28,9 @@ class IOFileSystem implements FileSystem {
     }
     return directory.childFile(name);
   }
+
+  @override
+  Future<Directory> get directory {
+    return _fileDir;
+  }
 }

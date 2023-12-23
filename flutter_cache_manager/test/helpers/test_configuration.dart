@@ -1,5 +1,6 @@
 import 'package:file/file.dart' show File;
 import 'package:file/memory.dart';
+import 'package:file/src/interface/directory.dart';
 import 'package:flutter_cache_manager/src/config/config.dart';
 import 'package:flutter_cache_manager/src/storage/file_system/file_system.dart';
 
@@ -25,4 +26,8 @@ class TestFileSystem extends FileSystem {
     await dir.create(recursive: true);
     return dir.childFile(name);
   }
+
+  @override
+  // TODO: implement directory
+  Future<Directory> get directory => throw UnimplementedError();
 }
